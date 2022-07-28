@@ -17,9 +17,9 @@ namespace BetterBot
 {
     public class BetterBot
     {
-        private DiscordSocketClient client = null;
+        private DiscordShardedClient client = null;
        private IServiceProvider _services = null;
-        private CommandService _commandService = null;
+        private InteractionService _commandService = null;
 
         public static void Main(string[] args)
             => new BetterBot().MainAsync().GetAwaiter().GetResult();
@@ -31,7 +31,7 @@ namespace BetterBot
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
 
-            client = new DiscordSocketClient(new DiscordSocketConfig()
+            client = new DiscordShardedClient(new DiscordSocketConfig()
             {
                 GatewayIntents = GatewayIntents.AllUnprivileged,
                 DefaultRetryMode = RetryMode.AlwaysRetry,
@@ -39,15 +39,16 @@ namespace BetterBot
                 AlwaysDownloadUsers = true,
             });
 
-            _commandService = new CommandService(new CommandServiceConfig()
+            _commandService = new InteractionService(client, new InteractionServiceConfig()
             {
-                CaseSensitiveCommands = false,
-                DefaultRunMode = Discord.Commands.RunMode.Sync,
+                DefaultRunMode = Discord.Interactions.RunMode.Sync,
+                LogLevel = LogSeverity.Info,
+                UseCompiledLambda = true
             });
             var collection = new ServiceCollection()
                 .AddSingleton(client)
                 .AddSingleton(_commandService)
-                .AddSingleton<DiscordMessageEvent>()
+                .AddSingleton<DiscordInteractionEvent>()
                 .AddSingleton<DiscordReadyEvent>();
 
             _services = collection.BuildServiceProvider();
