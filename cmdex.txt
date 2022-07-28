@@ -1,0 +1,35 @@
+﻿using Discord;
+
+using Discord.Interactions;
+using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BetterBot.Commands
+{
+    public class hello : InteractionModuleBase
+    {
+        private readonly DiscordShardedClient client;
+       
+
+        public hello(DiscordShardedClient bot)
+        {
+            this.client = bot;
+        }
+
+        [SlashCommand("hello", "Get a hello")]
+        public async Task helloAsync()
+        {
+             await RespondAsync("hello");
+
+               await Context.Interaction.ModifyOriginalResponseAsync((msg) => { msg.Content = "test"; });
+
+            
+           
+            return;
+        }
+    }
+}
