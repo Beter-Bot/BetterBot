@@ -1,5 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using BetterBot.Utils;
+using Discord;
+
+using Discord.Interactions;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -9,25 +11,34 @@ using System.Threading.Tasks;
 
 namespace BetterBot.Commands
 {
-    public class hello : ModuleBase
+    public class hello : InteractionModuleBase
     {
-        private readonly DiscordSocketClient client;
-        private readonly CommandService commands;
+        private readonly DiscordShardedClient client;
+       
 
-        public hello(DiscordSocketClient bot, CommandService command)
+        public hello(DiscordShardedClient bot)
         {
             this.client = bot;
-            this.commands = command;
         }
 
-        [Command("hello"), Alias("hi")]
-        [Summary("get a hello")]
+        [SlashCommand("hello", "Get a hello")]
         public async Task helloAsync()
         {
+            var data = await RamApi.Run("hello", "english");
+            Console.WriteLine(data);
+
+            if (data == null) return;
+
+            if(data.Too_many_requests != null)
+            {
+                await RespondAsync("Ram api ratelimit reached try again in a few seconds");
+                return;
+            }
+
+            await RespondAsync($"{data.text}");
 
             
-
-            await ReplyAsync($"Hello");
+           
             return;
         }
     }
