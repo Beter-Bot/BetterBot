@@ -1,6 +1,8 @@
 ﻿using BetterBot.Utils;
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,27 +14,49 @@ namespace BetterBot.Events
     [PreInitialize]
     public class DiscordReadyEvent
     {
-        private readonly DiscordSocketClient ram;
+        private readonly DiscordShardedClient client;
+        private readonly InteractionService commands;
 
-        public DiscordReadyEvent(DiscordSocketClient client)
+        public DiscordReadyEvent(DiscordShardedClient bot, InteractionService _commands)
         {
-            client.Ready += Client_Ready;
 
-            ram = client;
+            client = bot;
+            commands = _commands;
+            bot.ShardReady += Client_Ready;
+
+            
+           
         }
 
-        public async Task Client_Ready()
+        public async Task Client_Ready(DiscordSocketClient client)
         {
-            await ram.SetGameAsync($"/help | {BotConfig.VERSION}");
-            await ram.SetStatusAsync(UserStatus.Idle);
+            await client.SetGameAsync($"/help | {BotConfig.VERSION}");
+            await client.SetStatusAsync(UserStatus.Idle);
 
+            var data = await RamApiv.Run();
+
+            Console.WriteLine(data);
+
+
+
+
+#if DEBUG
+            await commands.RegisterCommandsToGuildAsync(936050113602793483);
+#else
+            await commands.RegisterCommandsGloballyAsync();
+#endif
             Console.WriteLine("Ready");
 
 
-            
 
 
-            
+
+
+
+
+
+
+
         }
     }
 }
