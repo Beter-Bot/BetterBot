@@ -8,6 +8,7 @@
 *.suo
 *.user
 *.sln.docstates
+config.cs
 
 # Build results
 [Dd]ebug/
